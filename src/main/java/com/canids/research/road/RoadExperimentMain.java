@@ -62,7 +62,7 @@ public final class RoadExperimentMain {
                 new SlidingWindowFeatureExtractor(windowSeconds, strideSeconds);
         int captureCount = 0;
 
-        // Stream captures one at a time to avoid retaining all raw ROAD rows in memory.
+        // 3. Stream captures one at a time to avoid retaining all raw ROAD rows in memory.
         for (Path csv : csvFiles) {
             var captureOption = RoadDatasetReader.readCapture(input, csv);
             if (captureOption.isEmpty()) {
@@ -99,7 +99,7 @@ public final class RoadExperimentMain {
                 (heldOut[index] ? test : train).add(samples.get(index));
             }
 
-            // Paper Section IV-D settings: 64 dimensions, 100 walks/node, length 15, p=1.5, q=0.5.
+            // 5. Paper Section IV-D settings: 64 dimensions, 100 walks/node, length 15, p=1.5, q=0.5.
             // This encoder shares vectors learned from training-fold graphs; skip-gram details are implementation choices.
             Node2VecEncoder encoder = new Node2VecEncoder(64, 100, 15, 1.5, 0.5, 1, 42 + fold);
             encoder.fit(train);
@@ -112,7 +112,7 @@ public final class RoadExperimentMain {
                 labels[i] = sample.label();
             }
 
-            // Paper Section IV-E: balance only the training fold to the stated 1:10 minority/majority ratio.
+            // 8. Paper Section IV-E: balance only the training fold to the stated 1:10 minority/majority ratio.
             Smote.Dataset balanced = Smote.oversample(features, labels, 0.1, 100 + fold);
             RandomForestClassifier classifier =
                     new RandomForestClassifier(100, 20, 6, 2, 200 + fold);
